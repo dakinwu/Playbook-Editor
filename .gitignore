@@ -1,0 +1,13 @@
+__pycache__/
+static/
+staticfiles/
+
+*.crt
+*.key
+*.sqlite3
+*.doc
+*.txt
+*.whl
+aad.config.json
+
+!requirements.txt

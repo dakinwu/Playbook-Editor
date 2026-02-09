@@ -1,0 +1,15 @@
+<form method="post">
+    {% csrf_token %}
+    <td style="width: 20%; border: 1px solid black;">&nbsp;&nbsp;&nbsp;
+        <input type="hidden" name="field_name" value={{fieldname}}>
+        <p>{{ field_value|default:"" }}</p>
+    </td>
+    <td style="width: 10%; border: 1px solid black;">
+        <div class="d-grid gap-2 d-md-block">
+            <button  class="btn btn-secondary btn-rounded" data-mdb-ripple-init type="submit" style="padding: 0.2rem 1rem;">確認</button>
+        </div>
+    </td>
+</form>
+
+
+        

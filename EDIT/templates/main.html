@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>文字編輯平台</title>
+  <!-- Meta -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="{% load static %}{% static 'images/favicon.ico' %}" type = "image/x-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="{% load static %}{% static 'chatbot.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% load static %}{% static 'edit.css' %}">
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    @font-face {
+      font-family: 'FakePearl-Regular';
+      src: url(https://cdn.jsdelivr.net/gh/max32002/FakePearl@1.1/webfont/FakePearl-Regular.woff2) format("woff2"), 
+          url(https://cdn.jsdelivr.net/gh/max32002/FakePearl@1.1/webfont/FakePearl-Regular.woff) format("woff");
+    }
+    *{
+      font-family: 'FakePearl-Regular', sans-serif !important;
+      letter-spacing: 0.1em;
+      box-sizing: border-box;
+    }
+    .inp {
+      position: relative;
+      margin: auto;
+      width: 100%;
+      max-width: 280px;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .inp .label {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.5);
+      font-weight: 500;
+      transform-origin: 0 0;
+      transform: translate3d(0, 0, 0);
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+    .inp .focus-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.05);
+      z-index: -1;
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    .inp input {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+          appearance: none;
+      width: 100%;
+      border: 0;
+      font-family: inherit;
+      padding: 16px 12px 0 12px;
+      height: 56px;
+      font-size: 16px;
+      font-weight: 400;
+      background: rgba(0, 0, 0, 0.02);
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+      color: #000;
+      transition: all 0.15s ease;
+    }
+    .inp input:hover {
+      background: rgba(0, 0, 0, 0.04);
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+    }
+    .inp input:not(:-moz-placeholder-shown) + .label {
+      color: rgba(0, 0, 0, 0.5);
+      transform: translate3d(0, -12px, 0) scale(0.75);
+    }
+    .inp input:not(:-ms-input-placeholder) + .label {
+      color: rgba(0, 0, 0, 0.5);
+      transform: translate3d(0, -12px, 0) scale(0.75);
+    }
+    .inp input:not(:placeholder-shown) + .label {
+      color: rgba(0, 0, 0, 0.5);
+      transform: translate3d(0, -12px, 0) scale(0.75);
+    }
+    .inp input:focus {
+      background: rgba(0, 0, 0, 0.05);
+      outline: none;
+      box-shadow: inset 0 -2px 0 #0077FF;
+    }
+    .inp input:focus + .label {
+      color: #0077FF;
+      transform: translate3d(0, -12px, 0) scale(0.75);
+    }
+    .inp input:focus + .label + .focus-bg {
+      transform: scaleX(1);
+      transition: all 0.1s ease;
+    }
+    .subcontainer {
+      padding-top: 20px;
+      margin: 0 auto;
+      width: 100%;
+      text-align: center;
+    }
+    .button-55 {
+      align-self: center;
+      background-color: #fff;
+      background-image: none;
+      background-position: 0 90%;
+      background-repeat: repeat no-repeat;
+      background-size: 4px 3px;
+      border-radius: 15px 225px 255px 15px 15px 255px 225px 15px;
+      border-style: solid;
+      border-width: 2px;
+      box-shadow: rgba(0, 0, 0, .2) 15px 28px 25px -18px;
+      box-sizing: border-box;
+      color: #41403e;
+      cursor: pointer;
+      display: inline-block;
+      font-family: Neucha, sans-serif;
+      font-size: 1rem;
+      line-height: 23px;
+      outline: none;
+      padding: .75rem;
+      text-decoration: none;
+      transition: all 235ms ease-in-out;
+      border-bottom-left-radius: 15px 255px;
+      border-bottom-right-radius: 225px 15px;
+      border-top-left-radius: 255px 15px;
+      border-top-right-radius: 15px 225px;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    .button-55:hover {
+      box-shadow: rgba(0, 0, 0, .3) 2px 8px 8px -5px;
+      transform: translate3d(0, 2px, 0);
+    }
+    .button-55:focus {
+      box-shadow: rgba(0, 0, 0, .3) 2px 8px 4px -6px;
+    }
+    .docs-page{
+      width: 100%;
+      background-image: url('static/dalle.png');
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    .docs-content{
+      background-color: white;
+    }
+  </style>
+</head>
+  <body class="docs-page" data-bs-spy="scroll" data-bs-target="#docs-nav" data-bs-root-margin="-100px 0px -40%">
+    {% include "base/header.html" %}
+    <div class="docs-wrapper container">
+      <div class="row">
+        <div id="docs-sidebar" class="docs-sidebar col-3">
+          <div class="top-search-box d-lg-none p-3">
+            <form class="search-form">
+              <input type="text" placeholder="搜尋主題..." name="search" class="form-control search-input">
+              <button type="submit" class="btn search-btn" value="Search">
+                <i class="fas fa-search"></i>
+              </button>
+            </form>
+          </div>
+          
+          <div class="navbar-area">
+            {% block content %}
+            {% endblock %}
+            {{ navbar|safe }}
+          </div>
+          
+        </div>
+        <div class="docs-content col-9" style="padding: 37.5px;">
+          <div id="contentArea">
+
+            <div id="originalContent">
+              {% for s in sessions %}
+                {{ s.html_code|safe }}
+              {% endfor %}
+            </div>
+
+          </div>
+          {% if request.identity_context_data.authenticated %}
+          <article class="docs-article" id="puzzle">
+            <header class="docs-header">
+            <h1 class="docs-heading" id="header-37" style="text-align: center; margin-bottom: 0;"><b>工作人脈大拼圖</b>
+            </h1>
+            </header>
+            <section class="docs-section">
+            <p style="font-size: 24px;"> 
+              歡迎您來到聚陽大家庭!它是幫助您在短時間內認識業務互動伙伴的小幫手，學長姐會帶領您一起認識他們，請將認識新伙伴的名字填寫在拼圖內空格中。Let's Go！
+            </p>
+            <p style="font-size: 20px;">
+              (<u>※為了讓您認識更多同仁，提醒您，表格同一部門限簽一位同仁唷！請完整填寫表格各項內容及互動業務，並於一週內完成，mail照片檔或Scan檔給人資部Lia #2328，謝謝您！</u>)
+            </p>
+            <form method="post" action="/save_friends/">
+            <table class="table table-striped">
+              <tbody>
+                <tr>
+                  <td style="text-align: left !important; padding: 20px !important;line-height: 3;">
+                    {% include 'base/input.html' with labelname="部門/姓名：" field_value=current_user.field1 fieldname="field1" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="分機/樓層：" field_value=current_user.field2 fieldname="field2" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="互動業務：" field_value=current_user.field3 fieldname="field3" %}
+                  </td>
+                  <td style="text-align: left !important; padding: 20px !important;line-height: 3;">
+                    {% include 'base/input.html' with labelname="部門/姓名：" field_value=current_user.field4 fieldname="field4" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="分機/樓層：" field_value=current_user.field5 fieldname="field5" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="互動業務：" field_value=current_user.field6 fieldname="field6" %}
+                  </td>
+                  <td style="text-align: left !important; padding: 20px !important;line-height: 3;">
+                    {% include 'base/input.html' with labelname="部門/姓名：" field_value=current_user.field7 fieldname="field7" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="分機/樓層：" field_value=current_user.field8 fieldname="field8" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="互動業務：" field_value=current_user.field9 fieldname="field9" %}
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="text-align: left !important; padding: 20px !important;line-height: 3;">
+                    {% include 'base/input.html' with labelname="部門/姓名：" field_value=current_user.field10 fieldname="field10" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="分機/樓層：" field_value=current_user.field11 fieldname="field11" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="互動業務：" field_value=current_user.field12 fieldname="field12" %}
+                  </td>
+                  <td style="text-align: left !important; padding: 20px !important;line-height: 3;">
+                    {% include 'base/input.html' with labelname="部門/姓名：" field_value=current_user.field13 fieldname="field13" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="分機/樓層：" field_value=current_user.field14 fieldname="field14" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="互動業務：" field_value=current_user.field15 fieldname="field15" %}
+                  </td>
+                  <td style="text-align: left !important; padding: 20px !important;line-height: 3;">
+                    {% include 'base/input.html' with labelname="部門/姓名：" field_value=current_user.field16 fieldname="field16" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="分機/樓層：" field_value=current_user.field17 fieldname="field17" %}
+                    <br>
+                    {% include 'base/input.html' with labelname="互動業務：" field_value=current_user.field18 fieldname="field18" %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            {% csrf_token %}
+            <div class="subcontainer">
+              <button type="submit" class="button-55" style="font-size: 18px;">提交</button>      
+            </div>
+            </form>
+          </section>
+          </article>
+          <!--         <article class="docs-article">
+            <header class="docs-header">
+              <h1 class="docs-heading" id="header-39" style="text-align: center;"><b>新進同仁課程檢核表</b><a aria-label="Anchor" class="anchorjs-link"  style="padding-left: 0.375em;">#</a></h1>
+            </header>
+            <table class="table table-striped">
+              <tbody>
+                <tr>
+                  <td style="font-weight: bold; width: 5%; border: 1px solid black;background-color: #FFE599;" >NO</td>
+                  <td style="font-weight: bold; border: 1px solid black;background-color: #FFE599;">時間</td>
+                  <td style="font-weight: bold; width: 15%;border: 1px solid black;background-color: #FFE599;">課程名稱</td>
+                  <td style="font-weight: bold; width: 50%;border: 1px solid black;background-color: #FFE599;">【實體】單元名稱</td>
+                  <td style="font-weight: bold; border: 1px solid black;background-color: #FFE599;">時數</td>
+                  <td style="font-weight: bold; border: 1px solid black;background-color: #FFE599;">新人確認</td>
+                </tr>
+              </tbody>
+            </table>
+          </article> -->
+          <article class="docs-article">
+            <header class="docs-header">
+              <h1 class="docs-heading" id="header-39" style="text-align: center;"><b>新進同仁引導執行檢核表</b></h1>
+            </header>
+            <p style="font-size: 24px;text-align: center;"><b>新人</b>：{{ current_user.ad_user }} <b>學長姐</b>：_</p>
+            <p style="font-size: 24px;"><b>※請新人報到一個月內執行以下項目，請學長姐在各項執行完成欄位簽名，最後由部門主管簽核後，mail照片檔或掃描檔予人資部-Lia#2328 ，謝謝您！</b></p>
+            <table style="border: 1px solid black;">
+              <tbody><tr>
+                <td style="width: 3%; border: 1px solid black; ">NO</td>
+                <td style="width: 70%; border: 1px solid black; ">引導重點</td>
+                <td style="width: 10%; border: 1px solid black; ">負責人員</td>
+                <td style="width: 17%; border: 1px solid black; ">完成日期簽名</td>
+              </tr>
+              <tr>
+                <td rowspan="8" style="border: 1px solid black;">報到一週內</td>
+                <td style="border: 1px solid black; text-align: left;">部門內新人介紹、認識部門伙伴、各樓層環境簡介</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field1|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: left;">公司周邊環境簡介(交通、飲食…)</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field2|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: left;">環境資源認識使用(ex:電話/傳真/影印機/飲水機/蒸飯箱/微波爐…)</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field3|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: left;">部門組織架構/目標與職掌詳細說明</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field4|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: left;">部門各成員主要工作項目簡介、部門內會議類型與頻率</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field5|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: left;">公司基本系統操作(會議室預約、按摩室預約、SPS、文管中心)、部門內/外部公檔資訊了解</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field6|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: left;">年度排休機制/排休系統操作、加班申請與工時規範</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field7|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black; text-align: left;background-color: #f0f0f0;"><b>工作人脈大拼圖(請於報到一週內完成)</b></td>
+                <td style="border: 1px solid black;background-color: #f0f0f0;"><b>學長姐</b></td>
+                <td style="border: 1px solid black;">{{ current_form.field8|default:'' }}</td>
+              </tr>
+              <tr>
+                <td rowspan="14" style="border: 1px solid black;">報到一個月內</td>
+                <td style="border: 1px solid black;  text-align: left; align-items: center;">工作規則之熟悉瞭解 (請至文管中心文件查詢系統)<br><p style="margin-bottom: 0 !important;">文件名稱：工作規範(文件編號07CTWN1)<br>文管中心系統位置：至SPS首頁→參考資訊→「文管中心文件」即可</p></td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field9|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">部門例行活動參與(週會、內部訓練…等)</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field10|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">系統操作了解及教導功能使用</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field11|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">部門相關各項專案簡介</td>
+                <td style="border: 1px solid black;">直屬主管</td>
+                <td style="border: 1px solid black;">{{ current_form.field12|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">個人負責工作項目實作及教導</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field13|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">了解與工作相關之制度辦法</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field14|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">指導各項產出報表(例行工作報表)</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field15|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">各部門業務內容之參考公檔路徑介紹</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field16|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">樣品室作業流程瞭解(主要對象是業務部同仁)</td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field17|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">專有名詞介紹<p style="font-size: 14px; margin-bottom: 0 !important;">(請至聚陽e點通之聚陽小百科)</p></td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field18|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">個人負責工作項目講解及指導</td>
+                <td style="border: 1px solid black;">直屬主管</td>
+                <td style="border: 1px solid black;">{{ current_form.field19|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;">新人試用期間工作目標設定說明<p style="font-size: 14px; margin-bottom: 0 !important;">(請參考：新人試用期評估項目)</p></td>
+                <td style="border: 1px solid black;">直屬主管</td>
+                <td style="border: 1px solid black;">{{ current_form.field20|default:'' }}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid black;  text-align: left;"><b>新人課程檢核表(請於報到一個月內繳回)</b></td>
+                <td style="border: 1px solid black;">學長姐</td>
+                <td style="border: 1px solid black;">{{ current_form.field21|default:'' }}</td>
+              </tr>
+              <tr>
+                <td colspan="3" style="border: 1px solid black;  text-align: left;background-color: #f0f0f0;"><b>※新人有約（與部門主管約談），請學長姐協助安排：約談時間為<u>    月    日</u>對於新人這段時間的表現與學習成果，<u>請部門主管寫下回饋、建議：</u></b><br>{{ current_form.field22|linebreaksbr }}</td>
+              </tr>
+            </tbody></table>
+          </article>
+          {% csrf_token %}
+          <form method="post" action="/send_email/" id="myForm">
+            <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
+            <input type="hidden" name="bossname" id="bossnameField">
+            <div style="display: flex; justify-content: center;">
+                <button class="button-55" style = "margin: 2em 0em; font-size: 18px;" type="button" onclick="askBossName(event)">發送郵件地址給主管</button>
+            </div>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!--docs-wrapper-->
+    <!-- Modal -->
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="changelogModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header" style="text-align:center; align-items: center;">
+              <h4 class="modal-title px-3 py-1" id="changelogModalLabel">試著詢問小寶典的問題吧！( ͡° ͜ʖ ͡°)</h4>
+              <button type="button" class="btn-close p-4" data-bs-dismiss="modal" aria-label="Close">
+              </button>
+            </div>
+            <div class="modal-body">
+              <div id="parent-container" style="display: flex;">
+                <div id="chatbot-container">
+                  <div id = "chatbot">
+                      <div id = "header">
+                          <div class="row-wrap">
+                            <div class="row-middle">智</div>
+                          </div>
+                          <div class="row-wrap">
+                            <div class="row-middle">能</div>
+                          </div>
+                          <div class="row-wrap">
+                            <div class="row-middle">問</div>
+                          </div>
+                          <div class="row-wrap">
+                            <div class="row-middle">答</div>
+                          </div>
+                      </div>
+                      <div id="chatlog">
+                          <div class="chatbot-message">
+                              <img src="{%static 'images/bot.png' %}" alt="Chatbot" class="message-avatar">
+                              <p class="chatbot-text"> 👋 你好！我是聚陽數轉部 LLM 開發團隊的 ChatMakalot 機器人，有什麼疑難雜症都可以跟我說喔！</p>
+                          </div>
+                      </div>
+                      <form id="chat-form">
+                          <message-container>
+                          {% csrf_token %}
+                              <input type="text" id="user-input" placeholder="請輸入...">
+                              <button type="submit" id="sendicon"><img src="/static/images/send.png" alt="送嗎" class = "btn-send"></button>
+                          </message-container>
+                      </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- chatbot Base -->
+    <div class="modal fade" id="chatModal1" tabindex="-1" aria-labelledby="changelogModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header" style="text-align:center; align-items: center;">
+              <h4 class="modal-title px-3 py-1" id="changelogModalLabel">試著與聊天機器人對話看看吧！⎛ -᷄ ᴥ -᷅ ⎞೯</h4>
+              <button type="button" class="btn-close p-4" data-bs-dismiss="modal" aria-label="Close">
+              </button>
+            </div>
+            <div class="modal-body">
+              <div id="parent-container1" style="display: flex;">
+                <div id="chatbot-container">
+                  <div id = "chatbot">
+                      <div id = "header">
+                          <div class="row-wrap">
+                            <div class="row-middle">智</div>
+                          </div>
+                          <div class="row-wrap">
+                            <div class="row-middle">能</div>
+                          </div>
+                          <div class="row-wrap">
+                            <div class="row-middle">問</div>
+                          </div>
+                          <div class="row-wrap">
+                            <div class="row-middle">答</div>
+                          </div>
+                      </div>
+                      <div id="chatlog1">
+                          <div class="chatbot-message">
+                              <img src="{%static 'images/bot.png' %}" alt="Chatbot" class="message-avatar">
+                              <p class="chatbot-text"> 👋 你好！我是聚陽數轉部 LLM 開發團隊的 ChatMakalot 機器人，有什麼疑難雜症都可以跟我說喔！</p>
+                          </div>
+                      </div>
+                      <form id="chat-form1">
+                          <message-container>
+                          {% csrf_token %}
+                              <input type="text" id="user-input1" placeholder="請輸入..." >
+                              <button type="submit" id="sendicon"><img src="/static/images/send.png" alt="送嗎" class = "btn-send"></button>
+                          </message-container>
+                      </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    <!-- chatbot Base End -->
+
+    <script type="text/javascript">
+      $(document).ready(function(){
+          $(window).scrollTop(0);
+      });
+    </script>
+    <script src="{% static 'webjava.js' %}">  </script>
+    <script>
+      var csrfToken = document.getElementById('csrfToken').value;
+      function urlmessage() {
+        event.preventDefault();
+        let myJsVariable = "{{ current_user.url }}";
+        Swal.fire(myJsVariable);
+      }
+      function askBossName(event) {
+        event.preventDefault();
+        Swal.fire({
+            input: 'text',
+            inputLabel: '主管英文名字',
+            inputPlaceholder: '請輸入主管英文名字'
+        }).then((result) => {
+          if (result.value) { 
+            var bossName = result.value;
+            // 使用 AJAX 發送數據
+            sendEmailAjax(bossName);
+            // 將用戶輸入的主管名字存儲到隱藏字段
+            // document.getElementById('bossnameField').value = result.value;
+            // 提交表單
+            // document.getElementById('myForm').submit();
+          }
+        });
+      }
+      function sendEmailAjax(bossName) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/send_email/", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.setRequestHeader("X-CSRFToken", csrfToken);
+        xhr.onreadystatechange = function() {
+          if (this.readyState === XMLHttpRequest.DONE) {
+            // 解析 JSON 響應
+            var response = JSON.parse(this.responseText);
+            if (this.status === 200) {
+              if(response.status === "success") {
+                Swal.fire("郵件已發送", "", "success");
+              } else {
+                // 處理來自服務器的錯誤消息
+                Swal.fire("錯誤", response.message, "error");
+              }
+            } else {
+              // 處理非 200 狀態碼的情況
+              Swal.fire("錯誤", "發生未知錯誤", "error");
+            }
+          }
+        }
+        xhr.send("bossname=" + encodeURIComponent(bossName));
+      }
+      </script>
+    <script src="{% static 'chatbot.js' %}"></script>
+    <script src="{% static 'chatbot_base.js' %}"></script>
+  </body>
+</html>

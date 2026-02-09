@@ -1,0 +1,21 @@
+{% extends "main.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if request.identity_context_data.authenticated %}
+  <p style="padding-left: 1em;"><b>目前使用者：</b></p>
+  <a style=" text-align: center; text-decoration: none; padding-left: 1em;"><b><u>{{request.identity_context_data.username}}</u></b><br><br></a>
+  <p style="font-weight: bold; text-decoration: none;padding-left: 1em;"><a class="btn btn-outline-primary" href="{% url 'sign_out' %}">登出</a></p>
+  <!-- <p style="font-weight: bold; text-decoration: none; padding-left: 2em;"><a href="{% url 'logout' %}">登出</a></p> -->
+  {% if not user_in_group %}
+  <a href="#puzzle" style="font-weight: bold; text-align: center; text-decoration: none; padding-left: 1em; color: red;">新人請先看這裡</a>
+  {% endif %}
+{% else %}
+  <!-- <p>您尚未登入</p> -->
+  <!-- <a href="{% url 'login' %}">登入</a> -->
+  <p class="home-content-title-font">
+    <p style="display: flex; margin-left: 32px; margin-bottom: 0; align-items: center; font-size: 16px;"><b>請登入：</b>  <a class="btn btn-outline-primary" href="{% url 'sign_in' %}" style="align-items: center; font-size: 16px;">登入</a></p>
+  </p> 
+{% endif %}
+{% endblock %}
